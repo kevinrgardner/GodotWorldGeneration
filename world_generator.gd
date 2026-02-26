@@ -51,6 +51,9 @@ var _current_seed: int = 0
 var _road_segments: Array = []
 var _sidewalk_segments: Array = []
 
+# Track placed building footprints (Rect2 in X-Z) to prevent overlaps
+var _placed_buildings: Array = []
+
 const PedestrianScript = preload("res://pedestrian.gd")
 const CarScript = preload("res://car.gd")
 
@@ -155,6 +158,7 @@ func _clear_world() -> void:
 
 	_road_segments.clear()
 	_sidewalk_segments.clear()
+	_placed_buildings.clear()
 
 func _generate_streets() -> void:
 	var half_grid := grid_size / 2
@@ -415,6 +419,13 @@ func _build_navigation_meshes() -> void:
 	_nav_roads.navigation_mesh = road_nav_mesh
 	_nav_roads.navigation_layers = 2
 
+func _footprint_overlaps(center: Vector3, w: float, d: float) -> bool:
+	var new_rect := Rect2(center.x - w / 2.0, center.z - d / 2.0, w, d)
+	for existing in _placed_buildings:
+		if new_rect.intersects(existing):
+			return true
+	return false
+
 func _generate_buildings() -> void:
 	var half_grid := grid_size / 2
 	var usable_block_size := block_size - street_width
@@ -489,7 +500,14 @@ func _generate_buildings_along_edge(block_x: float, block_z: float, usable_size:
 			var final_width := width if is_horizontal else depth
 			var final_depth := depth if is_horizontal else width
 
-			_create_building(building_pos, final_width, height, final_depth)
+			if not _footprint_overlaps(building_pos, final_width, final_depth):
+				_create_building(building_pos, final_width, height, final_depth)
+				_placed_buildings.append(Rect2(
+					building_pos.x - final_width / 2.0,
+					building_pos.z - final_depth / 2.0,
+					final_width,
+					final_depth
+				))
 
 		current_pos += width + building_spacing
 
