@@ -1,0 +1,6 @@
+	
+	Task: 
+	We're going to make a game world using procedural generation using the godot game engine. Graphics will be minimal to start. we'll use capsules for people, rectangles for buildings, etc.   We want to have a street system where the buildings will be located adjacent to.  We need lighting and a camera that is moveable by the player. we're starting with Compatibility mode rendering. We won't use a github repo for this.
+	
+	Create and document a PLAN.md file where you plan out the game structure and phases of development.
+	only writ the PLAN.md file and be sure to keep it updated when we make changes.	

@@ -1,0 +1,108 @@
+CLAUDE SESSION CONTEXT - Godot Procedural City Generator
+=========================================================
+
+PROJECT OVERVIEW
+----------------
+A Godot 4 project (Compatibility renderer) that procedurally generates a city with:
+- Grid-based street layout with sidewalks
+- Randomly placed buildings along streets
+- Moving pedestrians on sidewalks (NavigationAgent3D)
+- Moving cars on roads (NavigationAgent3D)
+- Selection system for clicking on entities
+
+CURRENT STATE: All 7 phases complete and working.
+
+KEY FILES
+---------
+1. world_generator.gd - Main generation script attached to WorldGenerator node
+   - Generates streets, sidewalks, buildings, pedestrians, cars
+   - Builds navigation meshes programmatically
+   - Has @export parameters for all generation settings
+   - R key = new random world, T key = regenerate same seed
+
+2. pedestrian.gd - CharacterBody3D script for walking pedestrians
+   - Uses NavigationAgent3D on layer 1 (sidewalks)
+   - Walks to random points, pauses, repeats
+
+3. car.gd - CharacterBody3D script for driving cars
+   - Uses NavigationAgent3D on layer 2 (roads)
+   - Drives to random points, rotates to face direction
+
+4. selection_manager.gd - Handles entity selection
+   - Raycasts on mouse click (layer 2 for selection)
+   - Shows torus ring indicator (blue=building, green=pedestrian, red=car)
+   - Visualizes navigation path for selected pedestrians/cars
+
+5. player_camera.gd - Fly camera with WASD + Q/E + mouse look
+
+6. main.tscn - Scene structure with all nodes
+
+7. plan.md - Full development documentation
+
+IMPORTANT TECHNICAL DETAILS
+---------------------------
+Navigation Layers:
+- Layer 1 = Sidewalks (pedestrians)
+- Layer 2 = Roads (cars)
+
+Collision Layers:
+- Layer 2 = Selection raycasting
+- All selectable entities have collision_layer=2, collision_mask=0
+- This allows raycast detection WITHOUT physical collisions
+
+Street Geometry:
+- street_width = 8 units total
+- sidewalk_width = 1.5 units each side
+- road_width = 5 units (8 - 1.5 - 1.5)
+- Roads at y=0.01, sidewalks at y=0.05 (curb effect)
+- Corner sidewalk pieces added at each intersection
+
+Entity Structure:
+- Buildings: MeshInstance3D with child StaticBody3D for selection
+- Pedestrians: CharacterBody3D with CapsuleShape3D, NavigationAgent3D
+- Cars: CharacterBody3D with BoxShape3D, NavigationAgent3D, box body + 4 cylinder wheels
+
+SCENE HIERARCHY
+---------------
+Main (Node3D)
+├── WorldGenerator [world_generator.gd]
+│   ├── Ground, Streets, Sidewalks, Buildings
+│   ├── NavigationSidewalks (layer 1)
+│   ├── NavigationRoads (layer 2)
+│   ├── People, Cars
+├── PlayerCamera [player_camera.gd]
+├── SelectionManager [selection_manager.gd]
+└── Lighting (Sun + WorldEnvironment)
+
+GOTCHAS / LESSONS LEARNED
+-------------------------
+1. Don't use typed arrays like Array[Dictionary] - can cause issues, use untyped Array
+2. Don't use await in _ready() for generation - use call_deferred instead
+3. Car rotation: body is oriented along X axis, so rotation needs -PI/2 offset
+4. Sidewalk corners: Need explicit corner pieces at intersections, especially at map edges
+5. Selection collision: Must set collision_mask=0 or entities will physically collide
+
+CONFIGURABLE PARAMETERS (in Editor)
+-----------------------------------
+- grid_size: 5 (creates 5x5 blocks)
+- block_size: 30 units
+- street_width: 8 units
+- sidewalk_width: 1.5 units
+- building heights: 5-25 units
+- building widths: 4-10 units
+- building_density: 0.9
+- people_count: 50
+- person_speed: 1.5 units/sec
+- car_count: 20
+- car_speed: 8.0 units/sec
+
+NEXT STEPS
+----------
+Phase 8 is awaiting requirements. The selection system is ready for
+adding actions (the user mentioned considering actions behind selection).
+
+TO GET STARTED
+--------------
+1. Read plan.md for full documentation
+2. Read world_generator.gd to understand generation flow
+3. The project is fully functional - just run it to see current state

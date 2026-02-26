@@ -1,0 +1,62 @@
+[gd_scene load_steps=7 format=3 uid="uid://main_scene"]
+
+[ext_resource type="Script" path="res://player_camera.gd" id="1_camera"]
+[ext_resource type="Script" path="res://world_generator.gd" id="2_world_gen"]
+[ext_resource type="Script" path="res://selection_manager.gd" id="3_selection"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
+size = Vector2(200, 200)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ground"]
+albedo_color = Color(0.3, 0.35, 0.3, 1)
+
+[sub_resource type="Environment" id="Environment_world"]
+background_mode = 1
+background_color = Color(0.5, 0.6, 0.7, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.4, 0.4, 0.5, 1)
+ambient_light_energy = 0.5
+
+[node name="Main" type="Node3D"]
+
+[node name="WorldGenerator" type="Node3D" parent="."]
+script = ExtResource("2_world_gen")
+
+[node name="Ground" type="MeshInstance3D" parent="WorldGenerator"]
+mesh = SubResource("PlaneMesh_ground")
+surface_material_override/0 = SubResource("StandardMaterial3D_ground")
+
+[node name="Streets" type="Node3D" parent="WorldGenerator"]
+
+[node name="Sidewalks" type="Node3D" parent="WorldGenerator"]
+
+[node name="Buildings" type="Node3D" parent="WorldGenerator"]
+
+[node name="NavigationSidewalks" type="NavigationRegion3D" parent="WorldGenerator"]
+navigation_layers = 1
+
+[node name="NavigationRoads" type="NavigationRegion3D" parent="WorldGenerator"]
+navigation_layers = 2
+
+[node name="People" type="Node3D" parent="WorldGenerator"]
+
+[node name="Cars" type="Node3D" parent="WorldGenerator"]
+
+[node name="PlayerCamera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 30, 30)
+current = true
+script = ExtResource("1_camera")
+
+[node name="SelectionManager" type="Node3D" parent="."]
+script = ExtResource("3_selection")
+
+[node name="Lighting" type="Node3D" parent="."]
+
+[node name="Sun" type="DirectionalLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 50, 0)
+light_color = Color(1, 0.95, 0.85, 1)
+light_energy = 1.2
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Lighting"]
+environment = SubResource("Environment_world")
