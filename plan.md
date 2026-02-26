@@ -113,8 +113,8 @@ Main (Node3D)
 ---
 
 ## Current Status
-**Phase**: All Phases Complete (1-7)
-**Last Updated**: Phase 7 implemented (selection system)
+**Phase**: All Phases Complete (1-7) + Bug Fixes
+**Last Updated**: Building overlap fix applied
 
 ### Files Created
 - `project.godot` - Project configuration with Compatibility renderer
@@ -182,6 +182,18 @@ Main (Node3D)
 
 ## Future Features
 *Planned features for upcoming phases:*
+
+---
+
+## Bug Fixes & Improvements
+
+### Building Overlap [FIXED]
+- [x] Track placed building X-Z footprints (`Rect2`) in `_placed_buildings` array
+- [x] Added `_footprint_overlaps()` check before placing each building
+- [x] Skip buildings whose footprint intersects an existing one (corner overlaps between perpendicular block edges)
+- [x] Reset footprint list on each world regeneration via `_clear_world()`
+
+---
 
 ### Phase 8: TBD
 - [ ] (awaiting requirements)
